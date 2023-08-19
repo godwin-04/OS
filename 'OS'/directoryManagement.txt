@@ -1,0 +1,151 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <dirent.h>
+#include <sys/stat.h>
+#include <string.h>
+void createDirectory(const char *dirName);
+void listFiles();
+void navigateDirectory(const char *dirName);
+void removeDirectory(const char *dirName);
+void displayDirectoryContents(const char *dirName);
+void createDirectory(const char *dirName) {
+if (mkdir(dirName, 0777) == 0) {
+printf("Directory created successfully.\n");
+} else {
+printf("Failed to create directory.\n");
+}
+}
+/*The mkdir function in C is used to create a new directory in a file system. It is
+defined in the header file.The mkdir function returns 0 on success, indicating that
+the directory was created successfully. On failure, it returns -1, and the reason for
+the failure can be determined by checking the value of the global errno variable.
+Some common reasons for failure include insufficient permissions, an existing
+directory with the same name, or a nonexistent parent directory.
+*/
+void listFiles() {
+DIR *dir;
+struct dirent *entry;
+int fileCount = 0;
+if ((dir = opendir(".")) != NULL) {
+while ((entry = readdir(dir)) != NULL) {
+if (entry->d_type == DT_REG) {
+printf("%s\n", entry->d_name);
+
+fileCount++;
+}
+}
+closedir(dir);
+printf("Total files in the directory: %d\n", fileCount);
+} else {
+printf("Failed to open directory.\n");
+}
+}
+/*The opendir() function shall open a directory stream corresponding to the
+directory named by the dirname argument. The directory stream is positioned at
+the first entry. If the type DIR is implemented using a file descriptor, applications
+shall only be able to open up to a total of {OPEN_MAX} files and directories.
+*/
+void navigateDirectory(const char *dirName) {
+if (chdir(dirName) == 0) {
+printf("Directory changed successfully.\n");
+} else {
+printf("Failed to navigate to the directory.\n");
+}
+}
+void removeDirectory(const char *dirName) {
+if (rmdir(dirName) == 0) {
+printf("Directory removed successfully.\n");
+} else {
+printf("Failed to remove directory.\n");
+}
+}
+/*The rmdir function in C is used to remove (delete) an empty directory from a file
+system. It is defined in the header file.The rmdir function returns 0 on success,
+indicating that the directory was successfully removed. On failure, it returns -1, and
+the reason for the failure can be determined by checking the value of the global
+errno variable. Some common reasons for failure include insufficient permissions,
+a non-existent directory, or a non-empty directory (in which case, rmdir cannot
+remove it).
+*/
+void displayDirectoryContents(const char *dirName) {
+DIR *dir;
+struct dirent *entry;
+struct stat fileStat;
+if ((dir = opendir(dirName)) != NULL) {
+while ((entry = readdir(dir)) != NULL) {
+char filePath[100];
+sprintf(filePath, "%s/%s", dirName, entry->d_name);
+
+if (stat(filePath, &fileStat) == 0) {
+if (S_ISREG(fileStat.st_mode)) {
+printf("%s - Regular File\n", entry->d_name);
+} else if (S_ISDIR(fileStat.st_mode)) {
+printf("%s - Directory\n", entry->d_name);
+} else if (S_ISLNK(fileStat.st_mode)) {
+printf("%s - Symbolic Link\n", entry->d_name);
+} else if (S_ISFIFO(fileStat.st_mode)) {
+printf("%s - FIFO/pipe\n", entry->d_name);
+} else if (S_ISCHR(fileStat.st_mode)) {
+printf("%s - Character Device\n", entry->d_name);
+} else if (S_ISBLK(fileStat.st_mode)) {
+printf("%s - Block Device\n", entry->d_name);
+} else if (S_ISSOCK(fileStat.st_mode)) {
+printf("%s - Socket\n", entry->d_name);
+} else {
+printf("%s - Unknown\n", entry->d_name);
+}
+}
+}
+closedir(dir);
+} else {
+printf("Failed to open directory.\n");
+}
+}
+int main() {
+int choice;
+char dirName[100];
+while (1) {
+printf("\nDirectory Management System\n");
+printf("1. Create Directory\n");
+printf("2. List Files in Current Directory\n");
+printf("3. Navigate to Directory\n");
+printf("4. Remove Directory\n");
+printf("5. Display Directory Contents with File Types\n");
+printf("6. Exit\n");
+printf("Enter your choice: ");
+scanf("%d", &choice);
+switch (choice) {
+case 1:
+printf("Enter the directory name: ");
+scanf("%s", dirName);
+createDirectory(dirName);
+break;
+
+case 2:
+listFiles();
+break;
+case 3:
+printf("Enter the directory name: ");
+scanf("%s", dirName);
+navigateDirectory(dirName);
+break;
+case 4:
+printf("Enter the directory name: ");
+scanf("%s", dirName);
+removeDirectory(dirName);
+break;
+case 5:
+printf("Enter the directory name: ");
+scanf("%s", dirName);
+displayDirectoryContents(dirName);
+break;
+case 6:
+printf("Exiting program...\n");
+exit(0);
+default:
+printf("Invalid choice. Please try again.\n");
+break;
+}
+}
+return 0;
+}

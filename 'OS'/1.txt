@@ -1,0 +1,17 @@
+cd /
+cd proc
+echo
+cat cpuinfo | grep processor
+echo
+cat cpuinfo | grep core
+echo
+cat cpuinfo | grep MHz
+echo
+cat meminfo | grep MemTotal
+echo
+cat meminfo | grep MemFree
+echo
+cat stat | grep processes
+grep
+cat stat | grep ctxt
+echo

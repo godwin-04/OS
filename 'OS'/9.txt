@@ -1,0 +1,951 @@
+PAGE REPLACEMENT PROGRAMS
+
+1) FIFO
+
+CODE:-
+ #include<stdio.h>
+int main()
+{
+int i,j,n,a[50],frame[10],no,k,avail,count=0;
+            printf("\n ENTER THE NUMBER OF PAGES:\n");
+scanf("%d",&n);
+            printf("\n ENTER THE PAGE NUMBER :\n");
+            for(i=1;i<=n;i++)
+            scanf("%d",&a[i]);
+            printf("\n ENTER THE NUMBER OF FRAMES :");
+            scanf("%d",&no);
+for(i=0;i<no;i++)
+            frame[i]= -1;
+                        j=0;
+                        printf("\tref string\t page frames\n");
+for(i=1;i<=n;i++)
+                        {
+                                    printf("%d\t\t",a[i]);
+                                    avail=0;
+                                    for(k=0;k<no;k++)
+if(frame[k]==a[i])
+                                                avail=1;
+                                    if (avail==0)
+                                    {
+                                                frame[j]=a[i];
+                                                j=(j+1)%no;
+                                                count++;
+                                                for(k=0;k<no;k++)
+                                                printf("%d\t",frame[k]);
+}
+                                    printf("\n");
+}
+                        printf("Page Fault Is %d",count);
+                        return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2) LEAST RECENTLY USED
+
+CODE:-
+
+ #include<stdio.h>
+void main()
+{
+int q[20],p[50],c=0,c1,d,f,i,j,k=0,n,r,t,b[20],c2[20];
+printf("Enter no of pages:");
+scanf("%d",&n);
+printf("Enter the reference string:");
+for(i=0;i<n;i++)
+            scanf("%d",&p[i]);
+printf("Enter no of frames:");
+scanf("%d",&f);
+q[k]=p[k];
+printf("\n\t%d\n",q[k]);
+c++;
+k++;
+for(i=1;i<n;i++)
+            {
+                        c1=0;
+                        for(j=0;j<f;j++)
+                        {
+                                    if(p[i]!=q[j])
+                                    c1++;
+                        }
+                        if(c1==f)
+                        {
+                                    c++;
+                                    if(k<f)
+                                    {
+                                                q[k]=p[i];
+                                                k++;
+                                                for(j=0;j<k;j++)
+                                                printf("\t%d",q[j]);
+                                                printf("\n");
+                                    }
+                                    else
+                                    {
+                                                for(r=0;r<f;r++)
+                                                {
+                                                            c2[r]=0;
+                                                            for(j=i-1;j<n;j--)
+                                                            {
+                                                            if(q[r]!=p[j])
+                                                            c2[r]++;
+                                                            else
+                                                            break;
+                                                }
+                                    }
+                                    for(r=0;r<f;r++)
+                                     b[r]=c2[r];
+                                    for(r=0;r<f;r++)
+                                    {
+                                                for(j=r;j<f;j++)
+                                                {
+                                                            if(b[r]<b[j])
+                                                            {
+                                                                        t=b[r];
+                                                                        b[r]=b[j];
+                                                                        b[j]=t;
+                                                            }
+                                                }
+                                    }
+                                    for(r=0;r<f;r++)
+                                    {
+                                                if(c2[r]==b[0])
+                                                q[r]=p[i];
+                                                printf("\t%d",q[r]);
+                                    }
+                                    printf("\n");
+                        }
+            }
+}
+printf("\nThe no of page faults is %d",c);
+}
+
+
+3) OPTIMAL
+
+CODE:-
+
+#include <stdio.h>
+
+#define MAX_FRAMES 3
+#define MAX_PAGES 20
+
+int main() {
+    int pages[MAX_PAGES]; // Array to hold page references
+    int frames[MAX_FRAMES]; // Array to hold page frames
+    int pageFaults = 0; // Counter for page faults
+    int numPages, numFrames; // Number of pages and frames
+
+    printf("Enter the number of pages: ");
+    scanf("%d", &numPages);
+
+    printf("Enter the page references: ");
+    for (int i = 0; i < numPages; i++) {
+        scanf("%d", &pages[i]);
+    }
+
+    printf("Enter the number of frames: ");
+    scanf("%d", &numFrames);
+
+    // Initialize all frames to -1 (indicating an empty frame)
+    for (int i = 0; i < numFrames; i++) {
+        frames[i] = -1;
+    }
+
+    // Iterate through each page reference
+    for (int i = 0; i < numPages; i++) {
+        int page = pages[i];
+        int pageFound = 0; // Flag to check if page is already in a frame
+
+        // Check if the page is already in a frame
+        for (int j = 0; j < numFrames; j++) {
+            if (frames[j] == page) {
+                pageFound = 1;
+                break;
+            }
+        }
+
+        // If the page is not found in any frame, replace the optimal page
+        if (!pageFound) {
+            int optimalIndex = -1; // Index of the optimal page to replace
+            int farthestPage = i + 1; // Initialize farthest page to be replaced
+
+            // Iterate through each frame to find the optimal page to replace
+            for (int j = 0; j < numFrames; j++) {
+                int k;
+
+                // Iterate through remaining pages to find the farthest occurrence
+                for (k = i + 1; k < numPages; k++) {
+                    if (frames[j] == pages[k]) {
+                        if (k > farthestPage) {
+                            farthestPage = k;
+                            optimalIndex = j;
+                        }
+                        break;
+                    }
+                }
+
+                // If the page is not referenced in the future, replace it
+                if (k == numPages) {
+                    optimalIndex = j;
+                    break;
+                }
+            }
+
+            // Replace the optimal page with the new page
+            frames[optimalIndex] = page;
+            pageFaults++;
+        }
+
+        // Print the current page frames
+        printf("Page Frames: ");
+        for (int j = 0; j < numFrames; j++) {
+            if (frames[j] == -1) {
+                printf(" -");
+            } else {
+                printf(" %d", frames[j]);
+            }
+        }
+        printf("\n");
+    }
+
+    printf("Total Page Faults: %d\n", pageFaults);
+
+    return 0;
+}
+
+MEMORY MANAGEMENT PROGRAMS 
+
+1) FIRST FIT
+
+CODE:-
+#include <stdio.h>
+
+void main()
+{
+    int bsize[10], psize[10], bno, pno, flags[10], allocation[10], i, j;
+    int fragmentation[10];
+
+    for (i = 0; i < 10; i++)
+    {
+        flags[i] = 0;
+        allocation[i] = -1;
+        fragmentation[i] = 0;
+    }
+
+    printf("Enter the number of blocks: ");
+    scanf("%d", &bno);
+
+    printf("Enter the size of each block: ");
+    for (i = 0; i < bno; i++)
+        scanf("%d", &bsize[i]);
+
+    printf("Enter the number of processes: ");
+    scanf("%d", &pno);
+
+    printf("Enter the size of each process: ");
+    for (i = 0; i < pno; i++)
+        scanf("%d", &psize[i]);
+
+    // First Fit Allocation
+    for (i = 0; i < pno; i++)
+    {
+        for (j = 0; j < bno; j++)
+        {
+            if (flags[j] == 0 && bsize[j] >= psize[i])
+            {
+                allocation[j] = i;
+                fragmentation[i] = bsize[j] - psize[i];
+                flags[j] = 1;
+                break;
+            }
+        }
+    }
+
+    // Display allocation details
+    printf("\nBlock no.\tSize\t\tProcess no.\t\tSize\t\tFragmentation");
+    for (i = 0; i < bno; i++)
+    {
+        printf("\n%d\t\t%d\t\t", i + 1, bsize[i]);
+        if (flags[i] == 1)
+            printf("%d\t\t\t%d\t\t\t%d", allocation[i] + 1, psize[allocation[i]], fragmentation[allocation[i]]);
+        else
+            printf("Not allocated\t\t\t-\t\t\t-");
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+2) BEST FIT
+
+CODE:-
+
+#include<stdio.h>
+
+#define MAX_BLOCKS 10
+#define MAX_PROCESSES 10
+
+int main()
+{
+    int i, j, nb, np, allocation[MAX_PROCESSES];
+    int blocks[MAX_BLOCKS], processes[MAX_PROCESSES], flag[MAX_PROCESSES];
+    int processFragmentation[MAX_PROCESSES] = {0};
+    int totalFragmentation = 0;
+
+    printf("Enter the number of memory blocks: ");
+    scanf("%d", &nb);
+
+    printf("Enter the size of memory blocks: ");
+    for(i = 0; i < nb; i++)
+        scanf("%d", &blocks[i]);
+
+    printf("Enter the number of processes: ");
+    scanf("%d", &np);
+
+    printf("Enter the size of processes: ");
+    for(i = 0; i < np; i++)
+        scanf("%d", &processes[i]);
+
+    for(i = 0; i < np; i++)
+    {
+        allocation[i] = -1;
+        flag[i] = 0;
+    }
+
+    for(i = 0; i < np; i++)
+    {
+        int best_fit = -1;
+        for(j = 0; j < nb; j++)
+        {
+            if(blocks[j] >= processes[i])
+            {
+                if(best_fit == -1 || blocks[j] < blocks[best_fit])
+                    best_fit = j;
+            }
+        }
+
+        if(best_fit != -1)
+        {
+            allocation[i] = best_fit;
+            flag[best_fit] = 1;
+            processFragmentation[i] = blocks[best_fit] - processes[i];
+            blocks[best_fit] -= processes[i];
+        }
+    }
+
+    printf("\nProcess No.\tProcess Size\tBlock No.\tFragmentation\n");
+    for(i = 0; i < np; i++)
+    {
+        printf("%d\t\t%d\t\t", i + 1, processes[i]);
+        if(allocation[i] != -1)
+            printf("%d\t\t%d\n", allocation[i] + 1, processFragmentation[i]);
+        else
+            printf("Not Allocated\t-\n");
+    }
+
+    return 0;
+}
+                 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+3) WORST FIT
+
+CODE:-
+#include <stdio.h>
+
+void implimentWorstFit(int blockSize[], int blocks, int processSize[], int processes)
+{
+    int allocation[processes];
+    int occupied[blocks];
+    int fragmentation[processes];
+
+    for (int i = 0; i < processes; i++) {
+        allocation[i] = -1;
+        fragmentation[i] = 0;
+    }
+
+    for (int i = 0; i < blocks; i++) {
+        occupied[i] = 0;
+    }
+
+    for (int i = 0; i < processes; i++) {
+        int indexPlaced = -1;
+        for (int j = 0; j < blocks; j++) {
+            if (blockSize[j] >= processSize[i] && !occupied[j]) {
+                if (indexPlaced == -1)
+                    indexPlaced = j;
+                else if (blockSize[indexPlaced] < blockSize[j])
+                    indexPlaced = j;
+            }
+        }
+
+        if (indexPlaced != -1) {
+            allocation[i] = indexPlaced;
+            occupied[indexPlaced] = 1;
+            fragmentation[i] = blockSize[indexPlaced] - processSize[i];
+            blockSize[indexPlaced] -= processSize[i];
+        }
+    }
+
+    printf("\nProcess No.\tProcess Size\tBlock No.\tFragmentation\n");
+    for (int i = 0; i < processes; i++) {
+        printf("%d\t\t%d\t\t", i + 1, processSize[i]);
+        if (allocation[i] != -1)
+            printf("%d\t\t%d\n", allocation[i] + 1, fragmentation[i]);
+        else
+            printf("Not Allocated\t-\n");
+    }
+}
+
+int main()
+{
+    int blockSize[] = {100, 500, 200, 300, 600};
+    int processSize[] = {212, 417, 112, 426};
+    int blocks = sizeof(blockSize) / sizeof(blockSize[0]);
+    int processes = sizeof(processSize) / sizeof(processSize[0]);
+
+    implimentWorstFit(blockSize, blocks, processSize, processes);
+
+    return 0;
+}
+
+
+
+
+
+
+
+DISK SCHEDULING PROGRAMS 
+
+1) FCFS(FIRT COME FIRST SERVE)
+
+CODE:-
+
+#include<stdio.h>
+#include<stdlib.h>
+int main()
+{
+int RQ[100],i,n,TotalHeadMoment=0,initial;
+printf("Enter the number of Requests\n");
+scanf("%d",&n);
+printf("Enter the Requests sequence\n");
+for(i=0;i<n;i++)
+scanf("%d",&RQ[i]);
+printf("Enter initial head position\n");
+scanf("%d",&initial);
+// logic for FCFS disk scheduling
+for(i=0;i<n;i++)
+{
+TotalHeadMoment=TotalHeadMoment+abs(RQ[i]-initial);
+initial=RQ[i];
+}
+printf("Total head moment is %d",TotalHeadMoment);
+return 0;
+}                                                                                                                                                                          
+
+
+
+
+
+
+
+2) SSTF(SHORT SEEK TIME FIRST )
+
+CODE:-
+
+#include<stdio.h>
+#include<stdlib.h>
+#include<math.h>
+
+int calseektime(int arr[],int n,int start){
+    int total=0;
+    int visitor[n];
+    
+    for(int i=0;i<n;i++){
+        visitor[i]=0;
+    }
+    
+    int current=start;
+    for(int i=0;i<n;i++){
+        int minseektime=200000;
+        int seekidx=-1;
+        for(int j=0;j<n;j++){
+            if(!visitor[j] && abs(arr[j]-current)<minseektime){
+                minseektime=abs(arr[j]-current);
+                seekidx=j;
+            }
+        }
+        
+        if(seekidx!=-1){
+            total+=minseektime;
+            current=arr[seekidx];
+            visitor[seekidx]=1;
+        }
+    }
+    return total;
+}
+
+int main(){
+    int n;
+    int start;
+    printf("Enter number of requests : ");
+    scanf("%d",&n);
+    
+    int arr[n];
+    printf("Enter requests : \n");
+    for(int i=0;i<n;i++){
+        printf("Enter Request%d : ",i+1);
+        scanf("%d",&arr[i]);
+    }
+    
+    printf("Enter starting Request : ");
+    scanf("%d",&start);
+    
+    int seek_time=calseektime(arr,n,start);
+    printf("Total Seek Time is %d\n",seek_time);
+}
+
+
+
+
+
+3)  SCAN
+CODE:- 
+
+#include<stdio.h>
+#include<stdlib.h>
+int main()
+{
+    int RQ[100],i,j,n,TotalHeadMoment=0,initial,size,move;
+    printf("Enter the number of Requests\n");
+    scanf("%d",&n);
+    printf("Enter the Requests sequence\n");
+    for(i=0;i<n;i++)
+     scanf("%d",&RQ[i]);
+    printf("Enter initial head position\n");
+    scanf("%d",&initial);
+    printf("Enter total disk size\n");
+    scanf("%d",&size);
+    printf("Enter the head movement direction for high 1 and for low 0\n");
+    scanf("%d",&move);
+    
+    // logic for Scan disk scheduling
+    
+        /*logic for sort the request array */
+    for(i=0;i<n;i++)
+    {
+        for(j=0;j<n-i-1;j++)
+        {
+            if(RQ[j]>RQ[j+1])
+            {
+                int temp;
+                temp=RQ[j];
+                RQ[j]=RQ[j+1];
+                RQ[j+1]=temp;
+            }
+
+        }
+    }
+
+    int index;
+    for(i=0;i<n;i++)
+    {
+        if(initial<RQ[i])
+        {
+            index=i;
+            break;
+        }
+    }
+   
+    // if movement is towards high value
+    if(move==1)
+    {
+        for(i=index;i<n;i++)
+        {
+            TotalHeadMoment=TotalHeadMoment+abs(RQ[i]-initial);
+            initial=RQ[i];
+        }
+        //  last movement for max size 
+        TotalHeadMoment=TotalHeadMoment+abs(size-RQ[i-1]-1);
+        initial = size-1;
+        for(i=index-1;i>=0;i--)
+        {
+             TotalHeadMoment=TotalHeadMoment+abs(RQ[i]-initial);
+             initial=RQ[i];
+            
+        }
+    }
+    // if movement is towards low value
+    else
+    {
+        for(i=index-1;i>=0;i--)
+        {
+            TotalHeadMoment=TotalHeadMoment+abs(RQ[i]-initial);
+            initial=RQ[i];
+        }
+        //  last movement for min size 
+        TotalHeadMoment=TotalHeadMoment+abs(RQ[i+1]-0);
+        initial =0;
+        for(i=index;i<n;i++)
+        {
+             TotalHeadMoment=TotalHeadMoment+abs(RQ[i]-initial);
+             initial=RQ[i];
+            
+        }
+    }
+    
+    printf("Total head movement is %d",TotalHeadMoment);
+    return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+4) C-SCAN
+
+CODE:- 
+
+#include<stdio.h>
+#include<stdlib.h>
+int main()
+{
+    int RQ[100],i,j,n,TotalHeadMoment=0,initial,size,move;
+    printf("Enter the number of Requests\n");
+    scanf("%d",&n);
+    printf("Enter the Requests sequence\n");
+    for(i=0;i<n;i++)
+     scanf("%d",&RQ[i]);
+    printf("Enter initial head position\n");
+    scanf("%d",&initial);
+    printf("Enter total disk size\n");
+    scanf("%d",&size);
+    printf("Enter the head movement direction for high 1 and for low 0\n");
+    scanf("%d",&move);
+    
+    // logic for C-Scan disk scheduling
+    
+        /*logic for sort the request array */
+    for(i=0;i<n;i++)
+    {
+        for( j=0;j<n-i-1;j++)
+        {
+            if(RQ[j]>RQ[j+1])
+            {
+                int temp;
+                temp=RQ[j];
+                RQ[j]=RQ[j+1];
+                RQ[j+1]=temp;
+            }
+
+        }
+    }
+
+    int index;
+    for(i=0;i<n;i++)
+    {
+        if(initial<RQ[i])
+        {
+            index=i;
+            break;
+        }
+    }
+   
+    // if movement is towards high value
+    if(move==1)
+    {
+        for(i=index;i<n;i++)
+        {
+            TotalHeadMoment=TotalHeadMoment+abs(RQ[i]-initial);
+            initial=RQ[i];
+        }
+        //  last movement for max size 
+        TotalHeadMoment=TotalHeadMoment+abs(size-RQ[i-1]-1);
+        /*movement max to min disk */
+        TotalHeadMoment=TotalHeadMoment+abs(size-1-0);
+        initial=0;
+        for( i=0;i<index;i++)
+        {
+             TotalHeadMoment=TotalHeadMoment+abs(RQ[i]-initial);
+             initial=RQ[i];
+            
+        }
+    }
+    // if movement is towards low value
+    else
+    {
+        for(i=index-1;i>=0;i--)
+        {
+            TotalHeadMoment=TotalHeadMoment+abs(RQ[i]-initial);
+            initial=RQ[i];
+        }
+        //  last movement for min size 
+        TotalHeadMoment=TotalHeadMoment+abs(RQ[i+1]-0);
+        /*movement min to max disk */
+        TotalHeadMoment=TotalHeadMoment+abs(size-1-0);
+        initial =size-1;
+        for(i=n-1;i>=index;i--)
+        {
+             TotalHeadMoment=TotalHeadMoment+abs(RQ[i]-initial);
+             initial=RQ[i];
+            
+        }
+    }
+    
+    printf("Total head movement is %d",TotalHeadMoment);
+    return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+5) LOOK
+
+CODE:-
+
+#include<stdio.h>
+#include<stdlib.h>
+int main()
+{
+    int RQ[100],i,j,n,TotalHeadMoment=0,initial,size,move;
+    printf("Enter the number of Requests\n");
+    scanf("%d",&n);
+    printf("Enter the Requests sequence\n");
+    for(i=0;i<n;i++)
+     scanf("%d",&RQ[i]);
+    printf("Enter initial head position\n");
+    scanf("%d",&initial);
+    printf("Enter total disk size\n");
+    scanf("%d",&size);
+    printf("Enter the head movement direction for high 1 and for low 0\n");
+    scanf("%d",&move);
+    
+    // logic for look disk scheduling
+    
+        /*logic for sort the request array */
+    for(i=0;i<n;i++)
+    {
+        for(j=0;j<n-i-1;j++)
+        {
+            if(RQ[j]>RQ[j+1])
+            {
+                int temp;
+                temp=RQ[j];
+                RQ[j]=RQ[j+1];
+                RQ[j+1]=temp;
+            }
+
+        }
+    }
+
+    int index;
+    for(i=0;i<n;i++)
+    {
+        if(initial<RQ[i])
+        {
+            index=i;
+            break;
+        }
+    }
+   
+    // if movement is towards high value
+    if(move==1)
+    {
+        for(i=index;i<n;i++)
+        {
+            TotalHeadMoment=TotalHeadMoment+abs(RQ[i]-initial);
+            initial=RQ[i];
+        }
+        
+        for(i=index-1;i>=0;i--)
+        {
+             TotalHeadMoment=TotalHeadMoment+abs(RQ[i]-initial);
+             initial=RQ[i];
+            
+        }
+    }
+    // if movement is towards low value
+    else
+    {
+        for(i=index-1;i>=0;i--)
+        {
+            TotalHeadMoment=TotalHeadMoment+abs(RQ[i]-initial);
+            initial=RQ[i];
+        }
+        
+        for(i=index;i<n;i++)
+        {
+             TotalHeadMoment=TotalHeadMoment+abs(RQ[i]-initial);
+             initial=RQ[i];
+            
+        }
+    }
+    
+    printf("Total head movement is %d",TotalHeadMoment);
+    return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+6) C-LOOK
+CODE:-
+
+#include<stdio.h>
+#include<stdlib.h>
+int main()
+{
+    int RQ[100],i,j,n,TotalHeadMoment=0,initial,size,move;
+    printf("Enter the number of Requests\n");
+    scanf("%d",&n);
+    printf("Enter the Requests sequence\n");
+    for(i=0;i<n;i++)
+     scanf("%d",&RQ[i]);
+    printf("Enter initial head position\n");
+    scanf("%d",&initial);
+    printf("Enter total disk size\n");
+    scanf("%d",&size);
+    printf("Enter the head movement direction for high 1 and for low 0\n");
+    scanf("%d",&move);
+    
+    // logic for C-look disk scheduling
+    
+        /*logic for sort the request array */
+    for(i=0;i<n;i++)
+    {
+        for( j=0;j<n-i-1;j++)
+        {
+            if(RQ[j]>RQ[j+1])
+            {
+                int temp;
+                temp=RQ[j];
+                RQ[j]=RQ[j+1];
+                RQ[j+1]=temp;
+            }
+
+        }
+    }
+
+    int index;
+    for(i=0;i<n;i++)
+    {
+        if(initial<RQ[i])
+        {
+            index=i;
+            break;
+        }
+    }
+   
+    // if movement is towards high value
+    if(move==1)
+    {
+        for(i=index;i<n;i++)
+        {
+            TotalHeadMoment=TotalHeadMoment+abs(RQ[i]-initial);
+            initial=RQ[i];
+        }
+        
+        for( i=0;i<index;i++)
+        {
+             TotalHeadMoment=TotalHeadMoment+abs(RQ[i]-initial);
+             initial=RQ[i];
+            
+        }
+    }
+    // if movement is towards low value
+    else
+    {
+        for(i=index-1;i>=0;i--)
+        {
+            TotalHeadMoment=TotalHeadMoment+abs(RQ[i]-initial);
+            initial=RQ[i];
+        }
+        
+        for(i=n-1;i>=index;i--)
+        {
+             TotalHeadMoment=TotalHeadMoment+abs(RQ[i]-initial);
+             initial=RQ[i];
+            
+        }
+    }
+    
+    printf("Total head movement is %d",TotalHeadMoment);
+    return 0;
+}
+
+

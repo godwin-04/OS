@@ -1,0 +1,72 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <pthread.h>
+
+#define MAX_SIZE 100
+
+int numbers[MAX_SIZE];
+int numCount;
+int largestEven = -1;
+int smallestOdd = -1;
+ 
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+
+void *findLargestEven(void *arg) {
+    for (int i = 0; i < numCount; i++) {
+        if (numbers[i] % 2 == 0) {
+            pthread_mutex_lock(&mutex);
+            if (numbers[i] > largestEven) {
+                largestEven = numbers[i];
+            }
+            pthread_mutex_unlock(&mutex);
+        }
+    }
+
+    pthread_exit(NULL);
+}
+
+void *findSmallestOdd(void *arg) {
+    for (int i = 0; i < numCount; i++) {
+        if (numbers[i] % 2 != 0) {
+            pthread_mutex_lock(&mutex);
+            if (smallestOdd == -1 || numbers[i] < smallestOdd) {
+                smallestOdd = numbers[i];
+            }
+            pthread_mutex_unlock(&mutex);
+        }
+    }
+
+    pthread_exit(NULL);
+}
+
+int main() {
+    printf("Enter the number of elements: ");
+    scanf("%d", &numCount);
+
+    printf("Enter the elements:\n");
+    for (int i = 0; i < numCount; i++) {
+        scanf("%d", &numbers[i]);
+    }
+
+    pthread_t evenThread, oddThread;
+
+    pthread_create(&evenThread, NULL, findLargestEven, NULL);
+    pthread_create(&oddThread, NULL, findSmallestOdd, NULL);
+
+    pthread_join(evenThread, NULL);
+    pthread_join(oddThread, NULL);
+
+    if (largestEven == -1) {
+        printf("No even numbers found.\n");
+    } else {
+        printf("Largest even number: %d\n", largestEven);
+    }
+
+    if (smallestOdd == -1) {
+        printf("No odd numbers found.\n");
+    } else {
+        printf("Smallest odd number: %d\n", smallestOdd);
+    }
+
+    return 0;
+}

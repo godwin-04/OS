@@ -1,0 +1,159 @@
+#include <stdio.h>
+
+struct Process {
+    int pid;
+    int priority;
+    int burst_time;
+    int arrival_time;
+    int start_time;
+    int completion_time;
+    int waiting_time;
+    int turnaround_time;
+    int remaining_time;
+    int executed_time;
+};
+
+void displayGanttChart(struct Process processes[], int n) {
+    int i, j;
+    char ganttChart[100];
+
+    for (i = 0, j = 0; i < n; ++i) {
+        if (i > 0 && processes[i].start_time > processes[i - 1].completion_time) {
+            while (j < processes[i].start_time) {
+                ganttChart[j++] = '-';
+            }
+        }
+
+        while (j < processes[i].completion_time) {
+            ganttChart[j++] = '#';
+        }
+    }
+
+    printf("Gantt Chart:\n");
+
+    for (i = 0; i < j; ++i) {
+        printf("%c", ganttChart[i]);
+    }
+
+    printf("\n");
+}
+
+void calculateWaitingTime(struct Process processes[], int n) {
+    int currentTime, i, j;
+
+    for (i = 0; i < n; ++i) {
+        currentTime = processes[i].start_time;
+        processes[i].waiting_time = 0;
+
+        for (j = 0; j < n; ++j) {
+            if (processes[j].arrival_time < currentTime || (processes[j].arrival_time == currentTime && processes[j].priority < processes[i].priority)) {
+                processes[i].waiting_time += currentTime - processes[j].arrival_time;
+            }
+        }
+    }
+}
+
+void calculateTurnaroundTime(struct Process processes[], int n) {
+    int i;
+
+    for (i = 0; i < n; ++i) {
+        processes[i].turnaround_time = processes[i].burst_time + processes[i].waiting_time;
+    }
+}
+
+void calculateCompletionTime(struct Process processes[], int n) {
+    int i;
+
+    for (i = 0; i < n; ++i) {
+        processes[i].completion_time = processes[i].start_time + processes[i].turnaround_time;
+    }
+}
+
+void calculatePreemptivePriority(struct Process processes[], int n) {
+    int currentTime = 0, executed = 0, i, j, nextProcess;
+
+    while (executed < n) {
+        nextProcess = -1;
+
+        for (i = 0; i < n; ++i) {
+            if (processes[i].arrival_time <= currentTime && processes[i].remaining_time > 0) {
+                if (nextProcess == -1) {
+                    nextProcess = i;
+                } else if (processes[i].priority < processes[nextProcess].priority) {
+                    nextProcess = i;
+                }
+            }
+        }
+
+        if (nextProcess == -1) {
+            currentTime++;
+        } else {
+            if (processes[nextProcess].start_time == -1) {
+                processes[nextProcess].start_time = currentTime;
+            }
+
+            processes[nextProcess].remaining_time--;
+            currentTime++;
+            processes[nextProcess].executed_time++;
+
+            if (processes[nextProcess].remaining_time == 0) {
+                executed++;
+                processes[nextProcess].completion_time = currentTime;
+            }
+
+            for (j = 0; j < n; ++j) {
+                if (j != nextProcess && processes[j].arrival_time <= currentTime && processes[j].remaining_time > 0) {
+                    processes[j].waiting_time++;
+                }
+            }
+        }
+    }
+}
+
+void displayProcessDetails(struct Process processes[], int n) {
+    int i;
+
+    printf("\nProcess ID\tPriority\tBurst Time\tArrival Time\tStart Time\tCompletion Time\tWaiting Time\tTurnaround Time\n");
+
+    for (i = 0; i < n; ++i) {
+        printf("%d\t\t%d\t\t%d\t\t%d\t\t%d\t\t%d\t\t\t%d\t\t%d\n", processes[i].pid, processes[i].priority, processes[i].burst_time, processes[i].arrival_time, processes[i].start_time, processes[i].completion_time, processes[i].waiting_time, processes[i].turnaround_time);
+    }
+}
+
+int main() {
+    int n, i;
+
+    printf("Enter the number of processes: ");
+    scanf("%d", &n);
+
+    struct Process processes[n];
+
+    printf("\nEnter process details:\n");
+
+    for (i = 0; i < n; ++i) {
+        processes[i].pid = i + 1;
+        printf("Enter priority for process %d: ", i + 1);
+        scanf("%d", &processes[i].priority);
+        printf("Enter burst time for process %d: ", i + 1);
+        scanf("%d", &processes[i].burst_time);
+        printf("Enter arrival time for process %d: ", i + 1);
+        scanf("%d", &processes[i].arrival_time);
+        processes[i].start_time = -1;
+        processes[i].completion_time = -1;
+        processes[i].waiting_time = 0;
+        processes[i].turnaround_time = 0;
+        processes[i].remaining_time = processes[i].burst_time;
+        processes[i].executed_time = 0;
+    }
+
+    calculatePreemptivePriority(processes, n);
+    calculateWaitingTime(processes, n);
+    calculateTurnaroundTime(processes, n);
+    calculateCompletionTime(processes, n);
+
+    displayProcessDetails(processes, n);
+    displayGanttChart(processes, n);
+
+    return 0;
+}
+

@@ -1,0 +1,165 @@
+#include <stdio.h>
+#include <unistd.h>
+intmain()
+{
+intid;
+printf("Hello, World!\n");
+id=fork();
+if(id>0)
+{
+/*parent process*/
+printf("This is parent section [Process id: %d].\n",getpid());
+}
+elseif(id==0)
+{
+/*child process*/
+
+printf("fork created [Process id: %d].\n",getpid());
+printf("fork parent process id: %d.\n",getppid());
+}
+else
+{
+/*fork creation failed*/
+printf("fork creation failed!!!\n");
+}
+return0;
+}
+
+vfork():-
+#include<stdio.h>
+#include<stdlib.h>
+#include<unistd.h>
+#include<sys/types.h>
+#include<sys/wait.h>
+int main(){
+int pid=vfork();
+int sum=0;
+if(pid==0){
+for(int i=1;i<=10;i++){
+sum+=i;
+}
+printf("\nsum=%d (sum from 1 to 10 from child)\n",sum); exit(0);
+}
+else{
+for(int i=11;i<=20;i++){
+sum+=i;
+}
+printf("\nsum=%d (sum from 11 to 20 from parent)\n",sum); }
+return 0;
+}
+
+exec():-
+#include<stdio.h>
+#include<stdlib.h>
+#include<unistd.h>
+#include<sys/types.h>
+#include<sys/wait.h>
+int main(){
+
+int pid=fork();
+int sum=0;
+if(pid==0){
+execl("/bin/ls","ls",NULL);
+for(int i=1;i<=10;i++){
+sum+=i;
+}
+printf("\nsum=%d (sum from 1 to 10 from child)\n",sum); }
+else{
+for(int i=11;i<=20;i++){
+sum+=i;
+}
+printf("\nsum=%d (sum from 11 to 20 from parent)\n",sum); }
+return 0;
+}
+
+execlp()
+#include<stdio.h>
+#include<unistd.h>
+#include<stdlib.h>
+int main(){
+printf("PID=%d\n",getpid());
+execlp("ls","ls","-l",NULL);
+printf("back to original");
+return 0;
+}
+
+execl()
+#include<stdio.h>
+#include<unistd.h>
+#include<stdlib.h>
+int main(){
+printf("PID=%d\n",getpid());
+execl("/bin/ls","ls","-l",NULL); printf("back to
+original"); return 0;
+}
+
+
+execvp()
+#include<stdio.h>
+#include<unistd.h>
+#include<stdlib.h>
+int main(){
+printf("PID=%d\n",getpid()); char
+
+*args[]={"ls","-l",NULL}; execvp("ls",args);
+printf("back to original"); return 0;
+}
+
+execv()
+#include<stdio.h>
+#include<unistd.h>
+#include<stdlib.h>
+int main(){
+printf("PID=%d\n",getpid()); char
+*args[]={"ls","-l",NULL}; execv("/bin/ls",args);
+printf("back to original"); return 0;
+}
+
+
+
+wait() and sleep():-
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/wait.h>
+int main()
+{
+int id;
+printf("Hello, World!\n");
+id=fork();
+if(id>0)
+{
+printf("This is parent section [Process id: %d].\n",getpid());
+wait(NULL);
+printf("Child process is over");
+}
+else if(id==0)
+{
+printf("fork created [Process id: %d].\n",getpid());
+printf("fork parent process id: %d.\n",getppid());
+}
+
+else
+{
+printf("fork creation failed!!!\n");
+}
+return 0;
+}
+
+
+
+getpid () and getppid():-
+#include <stdio.h>
+#include <unistd.h>
+int main() {
+pid_t child_pid;
+child_pid = fork();
+if (child_pid == 0) {
+printf("Child process: PID = %d\n\t PPID = %d\n", getpid(), getppid()); }
+else if (child_pid > 0) {
+printf("Parent process: PID = %d\n", getpid());
+}
+else {
+printf("Fork failed\n");
+}
+return 0;
+}

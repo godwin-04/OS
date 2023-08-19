@@ -1,0 +1,89 @@
+1)rmdir 
+#include<stdio.h> 
+#include<sys/stat.h> 
+#include<sys/types.h> 
+#include<stdlib.h> 
+int main(int argc,char*argv[]){ 
+for(int i=1;i<=3;i++) 
+{ 
+int f=rmdir(argv[i],0777); 
+if(f==-1) 
+{ 
+prinƞ("\nDirectory doesn't exist\n"); 
+exit(-1); 
+} 
+else 
+prinƞ("\nDirctory with name [%s] Removed\n",argv[i]); 
+} 
+} 
+2)mkdir 
+#include<stdio.h> 
+#include<sys/stat.h> 
+#include<sys/types.h> 
+#include<stdlib.h> 
+int main(int argc,char*argv[]) 
+{ 
+int f; 
+for(int i=1;i<=3;i++) 
+{ 
+f=mkdir(argv[i],0777); 
+if(f==-1) 
+{ 
+prinƞ("\nCannot create a directory\n"); 
+exit(-1); 
+} 
+else 
+prinƞ("\nDirctory with name [%s] created\n",argv[i]); 
+prinƞ("argc:%d\n",argc); 
+prinƞ("argv:%s\n",argv[i]); 
+} 
+} 
+3)Cd 
+#include<stdio.h> 
+#include<sys/stat.h> 
+#include<sys/types.h> 
+#include<stdlib.h> 
+#include<unistd.h> 
+#include<errno.h> 
+#include<dirent.h> 
+#define NAME_MAX 100 
+int main(int argc,char *argv[]){ 
+char buff[NAME_MAX]; 
+char*path=argv[1]; 
+if(chdir(path)==-1) 
+{ 
+fprinƞ(stderr,"Error:Couldn't change to directory %s\n",path); 
+return 1; 
+} 
+getcwd(buff,NAME_MAX); 
+prinƞ("CWD is:%s\n",buff); 
+return 0; 
+} 
+4)Cwd 
+#include<stdio.h> 
+#include<sys/stat.h> 
+#include<sys/types.h> 
+#include<stdlib.h> 
+#include<unistd.h> 
+#include<errno.h> 
+#include<dirent.h> 
+void main(int argc,char *argv[]){ 
+char cwd[1024]; 
+DIR *p;
+struct dirent *d;
+if(getcwd(cwd,sizeof(cwd))!=NULL){
+fprinƞ(stdout,"Current Working Directory:%s\n",cwd);
+}
+else{
+perror("getwd() error");
+}
+p=opendir(cwd);
+if(p==NULL){
+perror("Cannot Find Directory");
+exit(-1);
+}
+while(d=readdir(p))
+{
+prinƞ("%s\t\n",d->d_name);
+}
+}

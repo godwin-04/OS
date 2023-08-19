@@ -1,0 +1,61 @@
+#include <stdio.h> 
+#include <fcntl.h> 
+#include <errno.h> 
+#include <unistd.h> 
+#include <string.h> 
+#include <sys/types.h> 
+int main() { 
+ int s, fd, sz; 
+ char c1[100]; 
+ do { 
+ printf("\n1)Create()\n2)Open()\n3)Close()\n4)Read()\n5)Write\n6)Unlink()\n7)Lseek
+()\n8)Exit\nEnter Choice: "); 
+ scanf("%d", & s); 
+ switch (s) { 
+ case 5: 
+ fd = open("f1.txt", O_WRONLY | O_CREAT, 0777); 
+ sz = write(fd, "hi,hello\n", strlen("hi,hello\n")); 
+ printf("sz=%d\n", sz); 
+ close(fd); 
+ break; 
+ case 4: 
+ fd = open("f1.txt", O_RDONLY); 
+ sz = read(fd, c1, 10); 
+ printf("fd=%d\n", fd); 
+ printf("sz=%d\n", sz); 
+ printf("c1=%s\n", c1); 
+ close(fd); 
+ break; 
+ case 1: 
+ fd = creat("f1.txt", 0777); 
+ printf("fd=%d\n", fd); 
+ close(fd); 
+ break; 
+ case 2: 
+ fd = open("f1.txt", O_WRONLY | O_CREAT, 0777); 
+ printf("fd=%d\n", fd); 
+ break; 
+ case 3: 
+ close(fd); 
+ printf("fd=%d\n", fd); 
+ break; 
+ case 6: 
+ close(fd); 
+ sz = unlink("f1.txt"); 
+ printf("sz=%d\n", sz); 
+ break; 
+ case 7: 
+ fd = open("f1.txt", O_RDONLY); 
+ sz = lseek(fd, -1, SEEK_END); 
+ char b; 
+ printf("sz=%d\n", sz); 
+ for (int i = sz; i >= 0; i--) { 
+ lseek(fd, i, SEEK_SET); 
+ read(fd, & b, 1); 
+ printf("%c", b); 
+ } 
+ close(fd); 
+ break; 
+ } 
+ } while (s != 8); 
+} 
