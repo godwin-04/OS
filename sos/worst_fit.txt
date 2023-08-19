@@ -1,0 +1,36 @@
+#include <stdio.h>
+void worst_fit_memory_allocation(int blocks[], int processes[]) {
+int allocated = 0;
+int num_blocks, num_processes;
+printf("Enter the number of blocks: ");
+scanf("%d", &num_blocks);
+printf("Enter the number of processes: ");
+scanf("%d", &num_processes);
+for (int i = 0; i < num_blocks; i++) {
+blocks[i] = 0;
+}
+for (int i = 0; i < num_processes; i++) {
+processes[i] = 0;
+}
+for (int i = 0; i < num_processes; i++) {
+int worst_fit = -1;
+for (int j = 0; j < num_blocks; j++) {
+if (blocks[j] >= processes[i] && (worst_fit == -1 || blocks[j] > blocks[worst_fit])) {
+worst_fit = j;
+}
+}
+if (worst_fit != -1) {
+allocated++;
+printf("Process %d is allocated to block %d\n", i, worst_fit);
+blocks[worst_fit] -= processes[i];
+} else {
+printf("Process %d is not allocated\n", i);
+}
+}
+printf("Total processes allocated: %d\n", allocated);
+}
+int main() {
+int blocks[20], processes[20];
+worst_fit_memory_allocation(blocks, processes);
+return 0;
+}

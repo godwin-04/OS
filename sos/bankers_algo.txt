@@ -1,0 +1,77 @@
+#include <stdio.h>
+
+int main() {
+    int r, a = 0, inst[50], avail[50], p, i, b = 0, j, pro[10], max[50][50], count, need[10][10], o[10], k = 0, allo[20][20];
+
+    printf("\n Enter the number of resources: ");
+    scanf("%d", &r);
+
+    printf("\n Enter the max instances of each resource\n");
+    for (i = 0; i < r; i++) {
+        avail[i] = 0;
+        printf("%c = ", (i + 97));
+        scanf("%d", &inst[i]);
+    }
+
+    printf("Enter the number of processes: ");
+    scanf("%d", &p);
+
+    printf("\nEnter allocation:\n ");
+    for (i = 0; i < r; i++)
+        printf(" %c", (i + 97));
+    printf("\n");
+
+    for (i = 0; i < p; i++) {
+        pro[i] = i;
+        printf("P%d ", pro[i]);
+        for (j = 0; j < r; j++) {
+            scanf("%d", &allo[i][j]);
+            avail[j] += allo[i][j];
+        }
+    }
+
+    printf("Enter max need:\n ");
+    for (i = 0; i < r; i++) {
+        printf(" %c", (i + 97));
+        avail[i] = inst[i] - avail[i];
+    }
+    printf("\n");
+
+    for (i = 0; i < p; i++) {
+        printf("P%d ", i);
+        for (j = 0; j < r; j++)
+            scanf("%d", &max[i][j]);
+    }
+    printf("\n");
+
+A:
+    a = -1;
+    for (i = 0; i < p; i++) {
+        count = 0;
+        b = pro[i];
+        for (j = 0; j < r; j++) {
+            need[b][j] = max[b][j] - allo[b][j];
+            if (need[b][j] <= avail[j])
+                count++;
+        }
+        if (count == r) {
+            o[k++] = pro[i];
+            for (j = 0; j < r; j++)
+                avail[j] += allo[b][j];
+        } else
+            pro[++a] = pro[i];
+    }
+
+    if (a != -1) {
+        p = a + 1;
+        goto A;
+    }
+
+    printf("\n");
+    printf("Safe sequence is:\n");
+    for (i = 0; i < k; i++) {
+        printf(" P%d ", o[i]);
+    }
+
+    return 0;
+}

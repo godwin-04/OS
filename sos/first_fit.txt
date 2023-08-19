@@ -1,0 +1,50 @@
+#include <stdio.h>
+
+void firstFit(int block[], int m, int process[], int n) {
+    int allocation[n];
+    int i,j;
+    memset(allocation, -1, sizeof(allocation));
+
+    for (i = 0; i < n; i++) {
+        for ( j = 0; j < m; j++) {
+            if (block[j] >= process[i]) {
+                allocation[i] = j;
+                block[j] -= process[i];
+                break;
+            }
+        }
+    }
+
+    printf("Process No.\tProcess Size\tBlock No.\n");
+    for ( i = 0; i < n; i++) {
+        printf("%d\t\t%d\t\t", i+1, process[i]);
+        if (allocation[i] != -1)
+            printf("%d\n", allocation[i] + 1);
+        else
+            printf("Not Allocated\n");
+    }
+}
+
+int main() {
+    int m,i, n;
+
+    printf("Enter the number of memory blocks: ");
+    scanf("%d", &m);
+
+    printf("Enter the number of processes: ");
+    scanf("%d", &n);
+
+    int block[m], process[n];
+
+    printf("Enter the memory block sizes:\n");
+    for ( i = 0; i < m; i++)
+        scanf("%d", &block[i]);
+
+    printf("Enter the process sizes:\n");
+    for ( i = 0; i < n; i++)
+        scanf("%d", &process[i]);
+
+    firstFit(block, m, process, n);
+
+    return 0;
+}

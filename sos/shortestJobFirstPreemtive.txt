@@ -1,0 +1,56 @@
+#include <stdio.h>
+#define MAX_PROCESSES 10
+typedef struct { int processID; int arrivalTime; int burstTime;
+} Process;
+void calculateSJF(Process processes[], int n) { int remainingTime[MAX_PROCESSES];
+int completionTime[MAX_PROCESSES];
+int responseTime[MAX_PROCESSES];
+int waitingTime[MAX_PROCESSES]; int currentTime = 0;
+int completedProcesses = 0;
+ // Initialize remainingTime and completionTime arrays for (int i = 0; i < n; i++) {
+remainingTime[i] = processes[i].burstTime;
+completionTime[i] = 0; }
+while (completedProcesses < n) { int shortestJob = -1;
+int shortestBurst = 9999;
+// Find the process with the shortest remaining burst time
+for (int i = 0; i < n; i++) {
+if (processes[i].arrivalTime <= currentTime &&
+remainingTime[i] < shortestBurst && remainingTime[i] > 0) { shortestBurst = remainingTime[i];
+shortestJob = i; }
+}
+// If no process found, increment current time if (shortestJob == -1) {
+currentTime++;
+continue; }
+
+ // Update completion time completionTime[shortestJob] = currentTime + 1;
+// Decrement remaining burst time remainingTime[shortestJob]--;
+// Check if the process has completed if (remainingTime[shortestJob] == 0) {
+completedProcesses++;
+// Calculate response time
+responseTime[shortestJob] = completionTime[shortestJob] - processes[shortestJob].arrivalTime - processes[shortestJob].burstTime;
+// Calculate waiting time
+waitingTime[shortestJob] = completionTime[shortestJob] - processes[shortestJob].arrivalTime;
+}
+currentTime++; }
+
+ // Print Gantt chart printf("Gantt Chart:\n"); for (int i = 0; i < n; i++) {
+printf("| P%d ", processes[i].processID); }
+printf("|\n");
+// Print turnaround time, response time, and waiting time
+printf("\nProcess\tTurnaround Time\tResponse Time\tWaiting Time\n");
+for (int i = 0; i < n; i++) {
+printf("P%d\t%d\t\t%d\t\t%d\n", processes[i].processID,
+completionTime[i] - processes[i].arrivalTime, responseTime[i], waitingTime[i]);
+} }
+int main() { int n;
+Process processes[MAX_PROCESSES];
+printf("Enter the number of processes: "); scanf("%d", &n);
+printf("Enter arrival time and burst time for each process:\n");
+
+for (int i = 0; i < n; i++) {
+printf("Process %d:\n", i + 1); printf("Arrival Time: ");
+scanf("%d", &processes[i].arrivalTime); printf("Burst Time: ");
+scanf("%d", &processes[i].burstTime);
+processes[i].processID = i + 1; }
+calculateSJF(processes, n);
+return 0; }

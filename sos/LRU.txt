@@ -1,0 +1,81 @@
+#include <stdio.h>
+#include <stdbool.h>
+
+// Function to find page faults using indexes
+int pageFaults(int pages[], int n, int capacity)
+{
+	// To represent set of current pages. We use
+	// an array to simulate unordered_set in C
+	int s[capacity];
+	bool present[1000] = { false };
+	int indexes[1000];
+
+	// Start from initial page
+	int page_faults = 0;
+	int current_size = 0;
+	for (int i = 0; i < n; i++)
+	{
+		// Check if the set can hold more pages
+		if (current_size < capacity)
+		{
+			// Insert it into set if not present
+			// already which represents page fault
+			if (!present[pages[i]])
+			{
+				s[current_size] = pages[i];
+				present[pages[i]] = true;
+
+				// increment page fault
+				page_faults++;
+				current_size++;
+			}
+
+			// Store the recently used index of
+			// each page
+			indexes[pages[i]] = i;
+		}
+		else
+		{
+			// Check if current page is not already
+			// present in the set
+			if (!present[pages[i]])
+			{
+				// Find the least recently used pages
+				// that is present in the set
+				int lru = 0, val;
+				for (int j = 1; j < capacity; j++)
+				{
+					if (indexes[s[j]] < indexes[s[lru]])
+					{
+						lru = j;
+					}
+				}
+
+				// Remove the least recently used page
+				present[s[lru]] = false;
+
+				// insert the current page
+				s[lru] = pages[i];
+				present[pages[i]] = true;
+
+				// Increment page faults
+				page_faults++;
+			}
+
+			// Update the current page index
+			indexes[pages[i]] = i;
+		}
+	}
+
+	return page_faults;
+}
+
+// Driver code
+int main()
+{
+	int pages[] = {7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2};
+	int n = sizeof(pages) / sizeof(pages[0]);
+	int capacity = 4;
+	printf("Number of page faults :  %d\n", pageFaults(pages, n, capacity));
+	return 0;
+}

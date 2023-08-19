@@ -1,0 +1,43 @@
+#include <stdio.h>
+int main() {
+int n, i, wait = 0, tat2 = 0, f = 0;
+printf("Enter number of processes: ");
+scanf("%d", &n);
+int burst[n], waiting[n], tat[n], finish[n];
+printf("\nAssuming Arrival time = 0\n");
+printf("Enter burst time: ");
+for (i = 0; i < n; i++) {
+scanf("%d", &burst[i]);
+}
+waiting[0] = 0;
+for (i = 1; i < n; i++) {
+waiting[i] = waiting[i - 1] + burst[i - 1];
+}
+printf("Waiting time is: ");
+for (i = 0; i < n; i++) {
+printf("%d ", waiting[i]);
+wait += waiting[i];
+}
+printf("\nAverage Waiting time is: %d", wait / n);
+for (i = 0; i < n; i++) {
+tat[i] = waiting[i] + burst[i];
+tat2 += tat[i];
+}
+
+printf("\nTurnaround time is: ");
+for (i = 0; i < n; i++) {
+printf("%d ", tat[i]);
+}
+printf("\nAverage Turnaround time is: %d\n", tat2 / n);
+finish[0] = burst[0];
+for (i = 1; i < n; i++) {
+finish[i] = finish[i - 1] + burst[i];
+f += finish[i];
+}
+printf("Finish time is: ");
+for (i = 0; i < n; i++) {
+printf("%d ", finish[i]);
+}
+printf("\nAverage Finish time is: %d\n", f / n);
+return 0;
+}

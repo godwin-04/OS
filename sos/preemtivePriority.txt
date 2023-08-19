@@ -1,0 +1,57 @@
+#include <stdio.h>
+void swap(int *a, int *b)
+{
+int temp = *a;
+*a = *b;
+*b = temp;
+}
+int main()
+{
+int n;
+printf("Enter Number of Processes: ");
+scanf("%d", &n);
+int b[n], p[n], a[n], index[n];
+for (int i = 0; i < n; i++)
+{
+printf("Enter Burst Time, Priority, and Arrival Time for Process %d: ", i + 1); scanf("%d %d %d", &b[i], &p[i], &a[i]);
+index[i] = i + 1;
+}
+for (int i = 0; i < n; i++)
+{
+int highestPriorityIndex = i;
+for (int j = i + 1; j < n; j++)
+{
+if (p[j] < p[highestPriorityIndex] || (p[j] == p[highestPriorityIndex] && a[j] < a[highestPriorityIndex]))
+ {
+highestPriorityIndex = j;
+}
+}
+swap(&p[i], &p[highestPriorityIndex]);
+swap(&b[i], &b[highestPriorityIndex]);
+swap(&a[i], &a[highestPriorityIndex]);
+swap(&index[i], &index[highestPriorityIndex]);
+}
+int t = 0;
+printf("\nGantt Chart:\n");
+for (int i = 0; i < n; i++)
+{
+printf("P%d", index[i]);
+for (int j = 0; j < b[i]; j++)
+printf("-");
+t += b[i];
+}
+printf("\n\n");
+printf("Process Id Burst Time Wait Time Turnaround Time\n");
+int wait_time = 0;
+int total_wait_time = 0;
+int total_turnaround_time = 0;
+for (int i = 0; i < n; i++)
+{
+printf("P%d %d %d %d\n", index[i], b[i], wait_time, wait_time + b[i]); total_wait_time += wait_time;
+total_turnaround_time += wait_time + b[i];
+wait_time += b[i];
+}
+float avg_wait_time = (float)total_wait_time / n;
+float avg_turnaround_time = (float)total_turnaround_time / n; printf("\nAverage Waiting Time: %.2f\n", avg_wait_time); printf("Average Turnaround Time: %.2f\n", avg_turnaround_time); return 0;
+
+}

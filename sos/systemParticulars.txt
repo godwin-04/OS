@@ -1,0 +1,29 @@
+echo "Processor Information:"
+grep "processor" /proc/cpuinfo | wc -l
+echo "Cores Information:"
+grep "cpu cores" /proc/cpuinfo | uniq | awk '{print $4}'
+lscpu | grep "CPU(s):" | awk '{print "Number of Cores: " $2}'
+
+Shell Script:
+#!/bin/bash
+echo "Processor Information:"
+grep "processor" /proc/cpuinfo | wc -l
+echo "Cores Information:"
+grep "cpu cores" /proc/cpuinfo | uniq | awk '{print $4}'
+lscpu | grep "CPU(s):" | awk '{print "Number of Cores: " $2}'
+echo "No of processors are"
+lscpu | grep "Socket(s):" | awk '{print $2}'
+echo "Processor Information:"
+cat /proc/cpuinfo | grep "model name\|cpu cores\|cpu MHz" | uniq
+echo "Process Information:"
+ps aux --sort=-%cpu | head -n 11
+echo "Freq of each processor is "
+cat /proc/cpuinfo | grep "MHz"
+echo "Archietecture is"
+uname -m
+echo "Amount of physical memory available is"
+free -h | grep "Mem:" | awk '{print $2}'
+echo "Amount of free memory is"
+free -h | grep "Mem:" | awk '{print $4}'
+echo "Total number of forks and context switches since system boot:"
+cat /proc/stat | grep -e "processes" -e "ctxt" | awk '{print $1 ": " $2}’

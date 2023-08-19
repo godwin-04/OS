@@ -1,0 +1,53 @@
+#include <stdio.h>
+#include <pthread.h>
+#define ARRAY_SIZE 10
+#define NUM_THREADS 2
+int arr[ARRAY_SIZE] = {3, 7, 1, 9, 2, 5, 6, 8, 4, 0};
+int searchKey = 5;
+int foundIndex = -1;
+typedef struct {
+int start;
+int end;
+} ThreadArgs;
+void *linearSearch(void *arg) {
+ThreadArgs *args = (ThreadArgs *)arg;
+int start = args->start;
+int end = args->end;
+for (int i = start; i <= end; i++) {
+if (arr[i] == searchKey) {
+foundIndex = i;
+break;
+}
+}
+NAME:Arnav Balpande
+
+return NULL;
+}
+int main() {
+pthread_t threads[NUM_THREADS];
+ThreadArgs threadArgs[NUM_THREADS];
+int partitionSize = ARRAY_SIZE / NUM_THREADS;
+int remainder = ARRAY_SIZE % NUM_THREADS;
+int start = 0;
+int end = -1;
+for (int i = 0; i < NUM_THREADS; i++) {
+start = end + 1;
+end = start + partitionSize - 1;
+if (remainder > 0) {
+end++;
+remainder--;
+}
+threadArgs[i].start = start;
+threadArgs[i].end = end;
+pthread_create(&threads[i], NULL, linearSearch, (void *)&threadArgs[i]);
+}
+for (int i = 0; i < NUM_THREADS; i++) {
+pthread_join(threads[i], NULL);
+}
+if (foundIndex != -1) {
+printf("Key %d found at index %d\n", searchKey, foundIndex);
+} else {
+printf("Key %d not found\n", searchKey);
+}
+return 0;
+}

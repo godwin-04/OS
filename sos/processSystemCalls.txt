@@ -1,0 +1,145 @@
+Parent:
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/wait.h>
+int main (int argc, char **argv)
+{
+int i = 0;
+long sum;
+int pid;
+int status, ret;
+char *myargs [] = { NULL };
+char *myenv [] = { NULL };
+printf ("Parent: Hello, World!\n");
+pid = fork ();
+if (pid == 0) {
+// I am the child
+execve ("child", myargs, myenv);
+}
+// I am the parent
+printf ("Parent: Waiting for Child to complete.\n");
+if ((ret = waitpid (pid, &status, 0)) == -1)
+printf ("parent:error\n");
+if (ret == pid)
+printf ("Parent: Child process waited for.\n");
+}
+
+Child:
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define A 500
+#define B 600
+#define C 700
+int main (int argc, char **argv)
+{
+int i, j;
+long sum;
+// Some arbitrary work done by the child
+printf ("Child: Hello, World!\n");
+for (j = 0; j < 30; j++ ) {
+for (i =0; i < 900000; i++) {
+sum = A * i + B * i * i + C;
+sum %= 543;
+}
+}
+printf ("Child: Work completed!\n");
+printf ("Child: Bye now.\n");
+exit (0);
+}
+
+
+Fork System Call Example 1:
+
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+int main()
+{
+pid_t pid;
+int count = 0;
+pid = fork(); // create a child process
+if (pid == 0) { // child process
+printf("Child process is running.\n");
+} else if (pid > 0) { // parent process
+
+printf("Parent process is running.\n");
+wait(NULL); // wait for child to complete
+printf("Child process has completed.\n");
+} else { // fork failed
+printf("Fork failed.\n");
+return 1;
+}
+return 0;
+}
+
+fork example 2:
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+int main() {
+pid_t pid;
+int value = 0;
+pid = fork(); // create a new process
+if (pid == -1) {
+printf("Fork failed\n");
+exit(1);
+} else if (pid == 0) {
+printf("I am the child process. My pid is %d\n", getpid());
+value = 1;
+} else {
+printf("I am the parent process. My pid is %d\n", getpid());
+value = 2;
+}
+printf("I am process %d and my value is %d\n", getpid(), value);
+return 0;
+}
+
+Exec System Call:
+
+#include <stdio.h>
+#include <unistd.h>
+int main()
+{
+printf("Executing ls command using execvp() system call.\n");
+char *args[] = {"ls", "-l", NULL};
+execvp(args[0], args);
+printf("execvp() system call failed.\n");
+return 0;
+}
+
+
+Wait System call:
+
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/wait.h>
+int main()
+{
+pid_t pid;
+int status;
+pid = fork();
+if (pid == 0) { // child process
+printf("Child process is running.\n");
+sleep(2);
+printf("Child process is exiting.\n");
+
+return 10;
+} else if (pid > 0) { // parent process
+printf("Parent process is waiting for child to complete.\n");
+wait(&status); // wait for child to complete and get its exit status
+printf("Child exit status: %d\n", WEXITSTATUS(status));
+} else { // fork failed
+printf("Fork failed.\n");
+return 1;
+}
+return 0;
+}
+

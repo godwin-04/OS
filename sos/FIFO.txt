@@ -1,0 +1,48 @@
+#include <stdio.h>
+#define MAX_FRAMES 3
+#define MAX_PAGES 10
+void fifo_page_replacement(int pages[], int n) {
+int page_frames[MAX_FRAMES];
+int page_faults = 0;
+int i, j;
+for (i = 0; i < MAX_FRAMES; i++) {
+page_frames[i] = -1;
+}
+for (i = 0; i < n; i++) {
+int current_page = pages[i];
+int page_found = 0;
+for (j = 0; j < MAX_FRAMES; j++) {
+if (page_frames[j] == current_page) {
+page_found = 1;
+break;
+}
+}
+if (page_found == 0) {
+int fifo_index = 0;
+for (j = 1; j < MAX_FRAMES; j++) {
+if (page_frames[j] == -1) {
+fifo_index = j;
+break;
+}
+}
+page_frames[fifo_index] = current_page;
+page_faults++;
+}
+printf("Page %d: ", current_page);
+for (j = 0; j < MAX_FRAMES; j++) {
+if (page_frames[j] == -1) {
+printf("[ ] ");
+} else {
+printf("[%d] ", page_frames[j]);
+}
+}
+printf("\n");
+}
+printf("Total Page Faults: %d\n", page_faults);
+}
+int main() {
+int pages[MAX_PAGES] = {1, 2, 3, 5, 2, 4,5};
+int num_pages = sizeof(pages) / sizeof(pages[0]);
+fifo_page_replacement(pages, num_pages);
+return 0;
+}
